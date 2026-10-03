@@ -1,70 +1,94 @@
 # Bank Customer Churn Analysis
 
-An end-to-end data analytics project that analyzes bank customer data to identify the key drivers of customer churn, combining SQL-based business analysis and Python-based machine learning with a multi-page, interactive Power BI dashboard.
+**SQL • Python • Power BI | Public-dataset portfolio project**
 
-# Overview
+A customer-retention case study combining SQL segmentation, baseline classification models and a four-page Power BI dashboard.
 
-This project analyzes 10,000 bank customers across France, Germany, and Spain to answer:
+## Business question
 
-Which customer segments are most likely to churn?
-What factors most strongly predict churn?
-Which currently active customers are highest-risk and worth prioritizing for retention outreach?
+Which customer segments have higher observed churn, and where should a bank investigate retention opportunities?
 
-The workflow covers SQL segmentation analysis, Python-based predictive modeling, and a 4-page Power BI dashboard for exploring the results interactively.
+## Dataset
 
-# Dataset
-Attribute	Detail
-Records	10,000 bank customers
-Countries	France, Germany, Spain
-Target variable	Exited (1 = churned, 0 = retained)
+The included dataset contains **10,000 customers** across France, Germany and Spain. The target is Exited: 1 indicates churn and 0 indicates retention. Other fields cover age, credit score, balance, product count and active membership.
 
-# Key columns: 
-CustomerId, Surname, Geography, Gender, Age, Tenure, Balance, NumOfProducts, HasCrCard, IsActiveMember, EstimatedSalary, CreditScore, Exited
+This is a practice analysis, not a report on ICICI Bank or HDFC Bank customers.
 
-# SQL Analysis
+## Approach
 
-Business questions answered using CTEs, window functions, and subqueries in SQLite:
+- Analysed churn by geography, age, product count, balance and activity.
+- Used SQL CTEs, subqueries and window functions for segment comparisons and ranking.
+- Trained Random Forest and Logistic Regression on a stratified 80/20 split.
+- Built report pages for overview, customer details, geography and insights.
 
-Segmentation — churn rate by geography, gender, and age bracket
-Product engagement — churn rate by number of products and active membership status
-Financial profile — average balance and credit score for churned vs. retained customers
-At-risk prioritization — a CTE + RANK() window function query identifying the highest-balance, inactive, single-product customers per country
-Benchmarking — each country's churn rate compared against the overall average using a CTE + subquery
-Outlier detection — identifying the single most extreme segment (age × geography, product count × activity) using ABS() deviation ranking
-Modeling
+## Key findings
 
-# Two models were trained and directly compared to predict Exited:
+Figures below were recalculated from the included CSV.
 
-Random Forest was selected as the final model — it more than doubled recall on the churned class compared to Logistic Regression, likely due to its ability to capture non-linear interactions (e.g., a customer who is inactive and single-product and high-balance) that a linear model can't represent without manual feature engineering.
+| Measure | Result |
+|---|---:|
+| Overall churn | 20.37% |
+| Germany churn | 32.44% |
+| France churn | 16.15% |
+| Spain churn | 16.67% |
+| Inactive-member churn | 26.85% |
+| Active-member churn | 14.27% |
+| One-product customer churn | 27.71% |
+| Two-product customer churn | 7.58% |
 
-Key Model Findings (Logistic Regression coefficients)
-Feature	Coefficient	Direction
-Age	+0.74	Older customers → higher churn risk (strongest driver)
-Geography (Germany)	+0.36	Being in Germany → higher churn risk
-Balance	+0.16	Higher balance → slightly higher churn risk
-IsActiveMember	−0.52	Active members → substantially lower churn risk (strongest protective factor)
-Power BI Dashboard
+The three- and four-product groups also have high churn, but contain only 266 and 60 customers respectively. Product relationships should be examined by segment rather than interpreted as a simple linear trend.
 
-# A 4-page interactive dashboard with persistent sidebar navigation:
+## Model comparison
 
-Overview — KPI cards, churn rate by age group/geography/product count, and a live "Top 5 At-Risk Customers" table
-Customer Details — a searchable, full customer table with a conditionally formatted Risk Level column (High / Medium / Low)
-Geography Breakdown — country-level churn comparison with gender and risk-level splits
-Insights — key findings connecting SQL analysis and model results to plain-language, actionable takeaways
+Saved notebook results on 2,000 test customers:
 
-# Headline KPIs:
+| Model | Accuracy | Churn precision | Churn recall | Churn F1 |
+|---|---:|---:|---:|---:|
+| Random Forest | 0.86 | 0.77 | 0.45 | 0.57 |
+| Logistic Regression | 0.81 | 0.59 | 0.19 | 0.28 |
 
-Total Customers: 10,000
-Churn Rate: 20.37%
-Average Balance: $76.49K
-Average Credit Score: 651
-Average Tenure: 5.01 years
+Random Forest identifies more churned customers, but still misses about 55% at the evaluated threshold. These are exploratory results, not evidence of production readiness.
 
-# Tools Used
-SQL: SQLite (CTEs, window functions, subqueries, segmentation queries)
-Python: Pandas, NumPy, scikit-learn, Matplotlib, Seaborn
-Power BI: Power Query, DAX, multi-page navigation, conditional formatting
+## Business recommendations
 
-# Author
+- Investigate the higher churn observed in Germany.
+- Test outreach to disengaged customers and monitor response and retention.
+- Evaluate interventions through controlled measurement rather than assuming the observed associations are causal.
 
-Manish Kumar | LinkedIn- https://www.linkedin.com/in/manish071096 | GitHub- https://github.com/manish-kr0722/
+No retention campaign was implemented or measured in this project.
+
+## How to inspect the work
+
+1. Review the SQL script and notebook through the file links below.
+2. Open the PBIX file in Power BI Desktop. Update source paths if prompted.
+3. For the notebook, install pandas, numpy, matplotlib, seaborn, scikit-learn and Jupyter. Update its Colab-specific CSV path to the included Dataset folder.
+4. For SQL, import the CSV into SQL Server and confirm the database, table and column types before running queries.
+
+## Technical notes
+
+- The SQL script contains SQL Server-style statements; it is not a SQLite script.
+- Some percentage expressions currently use integer arithmetic. Change the leading multiplier from 100 to 100.0 before relying on SQL percentage outputs.
+- The displayed model metrics come from saved notebook outputs; they should be regenerated after further modelling changes.
+
+## Dashboard preview
+
+![Dashboard 1](Dashboard%20Image/Dashboard%201.jpg)
+
+![Dashboard 2](Dashboard%20Image/Dashboard%202.jpg)
+
+![Dashboard 3](Dashboard%20Image/Dashboard%203.jpg)
+
+![Dashboard 4](Dashboard%20Image/Dashboard%204.jpg)
+
+## Repository files
+
+- [Customer Churn Analysis- Dashboard.pbix](Customer%20Churn%20Analysis-%20Dashboard.pbix)
+- [Customer Churn Analysis.sql](Customer%20Churn%20Analysis.sql)
+- [Customer_Churn_Analysis.ipynb](Customer_Churn_Analysis.ipynb)
+- [Dataset/customer_churn.csv](Dataset/customer_churn.csv)
+
+## Author
+
+**Manish Kumar** — banking professional transitioning into Data Analytics.
+
+[LinkedIn](https://www.linkedin.com/in/manish071096/) · [GitHub](https://github.com/manish-kr0722)
